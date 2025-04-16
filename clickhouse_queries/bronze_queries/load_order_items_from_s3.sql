@@ -1,4 +1,4 @@
-INSERT INTO gold.order_items
+INSERT INTO bronze.order_items
 SELECT
     item_id,
     order_id,
