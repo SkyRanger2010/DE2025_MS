@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS gold;
-CREATE TABLE IF NOT EXISTS gold.order_items (
+CREATE DATABASE IF NOT EXISTS bronze;
+CREATE TABLE IF NOT EXISTS bronze.order_items (
     item_id UInt64,
     order_id UInt64,
     product_name String,
