@@ -1,4 +1,5 @@
-CREATE DATABASE IF NOT EXISTS bronze
+CREATE DATABASE IF NOT EXISTS bronze;
+
 CREATE TABLE IF NOT EXISTS bronze.orders (
     order_id UInt64,
     user_id UInt64,

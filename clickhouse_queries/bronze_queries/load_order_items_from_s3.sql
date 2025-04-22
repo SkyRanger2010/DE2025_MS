@@ -6,6 +6,6 @@ SELECT
     product_price,
     quantity
 FROM s3(
-    'https://storage.yandexcloud.net/data-proc-bucket/source/order_items.txt',
+    'https://storage.yandexcloud.net/data-proc-backet/source/order_items.txt',
     'CSVWithNames'
 ) SETTINGS format_csv_delimiter = ';';
