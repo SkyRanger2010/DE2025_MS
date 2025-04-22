@@ -1,11 +1,12 @@
 import sys
+sys.path.insert(0, "clickhouse_deps")
 from pyspark.sql import SparkSession
 from clickhouse_driver import Client
 import logging
 
 
 def spark_type_to_ch(spark_type):
-    # Простое соответствие Spark → ClickHouse типов
+
     mapping = {
         'StringType': 'String',
         'IntegerType': 'Int32',
@@ -16,7 +17,7 @@ def spark_type_to_ch(spark_type):
         'TimestampType': 'DateTime',
         'DateType': 'Date'
     }
-    return mapping.get(spark_type, 'String')  # по умолчанию String
+    return mapping.get(spark_type, 'String')  
 
 
 def create_clickhouse_table(client, df, ch_db, ch_table):
@@ -48,17 +49,17 @@ def write_to_clickhouse(df, ch_host, ch_db, ch_table, ch_user, ch_pass, ch_port=
         ca_certs=ca_cert
     )
 
-    # Создаем таблицу, если её нет
+
     create_clickhouse_table(client, df, ch_db, ch_table)
 
-    # Преобразуем Spark DataFrame в список кортежей
+
     data = [tuple(row) for row in df.collect()]
     insert_query = f"INSERT INTO {ch_db}.{ch_table} VALUES"
     client.execute(insert_query, data)
 
 
 if __name__ == "__main__":
-    # Аргументы из командной строки
+    
     hive_db = sys.argv[1]
     hive_table = sys.argv[2]
     ch_db = sys.argv[3]
@@ -67,16 +68,22 @@ if __name__ == "__main__":
     ch_user = sys.argv[6]
     ch_pass = sys.argv[7]
     ca_cert = sys.argv[8] if len(sys.argv) > 8 else None
+    if len(sys.argv) != 9:
+        print(f"[ERROR] Expected 8 arguments, but got {len(sys.argv) - 1}")
+        print("Usage: hive_to_clickhouse.py <hive_db> <hive_table> <ch_db> <ch_table> <ch_host> <ch_user> <ch_pass> <ca_cert>")
+        sys.exit(1)
 
+    print("Received arguments:")
+    print(sys.argv)   
+     
     spark = SparkSession.builder \
         .appName("HiveToClickHouse") \
         .enableHiveSupport() \
         .getOrCreate()
 
-    # Загружаем таблицу из Hive
+
     df = spark.sql(f"SELECT * FROM {hive_db}.{hive_table}")
 
-    # Пишем в ClickHouse
     write_to_clickhouse(df, ch_host, ch_db, ch_table, ch_user, ch_pass, ca_cert=ca_cert)
 
     spark.stop()
